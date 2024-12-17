@@ -1,45 +1,72 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
-
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { DrawerActions, useNavigation } from "@react-navigation/native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import MapScreen from "./map";
+import Search from "./search";
+import DonationsListScreen from "../donations";
+import Profile from "./profile";
+import { TabBar } from "@/components/TabBar";
+import AddDonationScreen from "../donations/add";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const navigation = useNavigation();
+  const Tab = createBottomTabNavigator();
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Tab.Navigator
+        screenOptions={{
+          headerTitleAlign: "center",
+          headerRight: () => (
+            <Ionicons
+              name="menu"
+              size={24}
+              color="black"
+              onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+              style={{ marginRight: 20 }}
+            />
+          ),
         }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+        tabBar={(props) => <TabBar {...props} />}
+      >
+        <Tab.Screen
+          name="map"
+          component={MapScreen}
+          options={{
+            title: "מפה",
+          }}
+        />
+        <Tab.Screen
+          name="search"
+          component={Search}
+          options={{
+            title: "חיפוש",
+          }}
+        />
+        <Tab.Screen
+          name="add donation"
+          component={AddDonationScreen}
+          options={{
+            title: "הוספת תרומה",
+          }}
+        />
+        <Tab.Screen
+          name="donations"
+          component={DonationsListScreen}
+          options={{
+            title: "תרומות",
+          }}
+        />
+        <Tab.Screen
+          name="profile"
+          component={Profile}
+          options={{
+            title: "פרופיל אישי",
+          }}
+        />
+      </Tab.Navigator>
+    </GestureHandlerRootView>
   );
 }
