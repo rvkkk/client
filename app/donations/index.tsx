@@ -90,7 +90,7 @@ const DonationsListScreen = () => {
 
   useEffect(() => {
     fetchDonations();
-    sortBottomSheetRef.current?.present()
+    sortBottomSheetRef.current?.expand()
   }, []);
 
   const fetchDonations = async () => {
