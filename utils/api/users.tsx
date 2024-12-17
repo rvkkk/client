@@ -47,7 +47,7 @@ export const getMyProfile = async (): Promise<any> => {
       const response = await apiClient.get('/my-profile');
       return response.data;
     } catch (error) {
-      console.error(`Error fetching user profile:`, error);
+      console.log(`Error fetching user profile:`, error);
       throw error;
     }
   };
