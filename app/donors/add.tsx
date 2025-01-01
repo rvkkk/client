@@ -342,7 +342,7 @@ const DonorDetailsScreen: ForwardRefRenderFunction<
             handleChangeText={(text) => {
               const parsedValue = Number.parseInt(text) || 0;
               // if (parsedValue >= 0 && parsedValue <= 120) {
-                onChange(parsedValue);
+              onChange(parsedValue);
               // }
             }}
             keyboardType="number-pad"

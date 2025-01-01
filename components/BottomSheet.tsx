@@ -11,7 +11,7 @@ const CustomBottomSheet = forwardRef<Ref, PropsWithChildren>(({ children }, ref)
 
   console.log(98479847)
   return (
-    <BottomSheetModal ref={ref} index={0} snapPoints={snapPoints} enablePanDownToClose>
+    <BottomSheetModal ref={ref} index={-1} snapPoints={snapPoints} enablePanDownToClose>
       <View style={styles.contentContainer}>{children}</View>
     </BottomSheetModal>
   );

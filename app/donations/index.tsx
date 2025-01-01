@@ -36,12 +36,13 @@ import BottomSheet, {
   BottomSheetModalProvider,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import CustomBottomSheet from "@/components/BottomSheet"
+import CustomBottomSheet from "@/components/BottomSheet";
 import Button from "@/components/Button";
 //import butt from 'react-native-paper';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import CustomerLink from "@/components/Link";
+import { FlashList } from "@shopify/flash-list";
 // import Animated, { useAnimatedRef, useScrollViewOffset } from "react-native-reanimated";
 
 type SortOption = "date" | "donorName" | "donorAddress" | "amount";
@@ -90,7 +91,7 @@ const DonationsListScreen = () => {
 
   useEffect(() => {
     fetchDonations();
-    sortBottomSheetRef.current?.expand()
+    sortBottomSheetRef.current?.present();
   }, []);
 
   const fetchDonations = async () => {
@@ -114,7 +115,7 @@ const DonationsListScreen = () => {
     }
   };
 
-  const filterBottomSheetRef = useRef<BottomSheetModal>(null);
+  //const filterBottomSheetRef = useRef<BottomSheetModal>(null);
   const sortBottomSheetRef = useRef<BottomSheetModal>(null);
 
   // // Snap points for bottom sheets
@@ -465,9 +466,13 @@ const DonationsListScreen = () => {
       <NativeViewGestureHandler>
         <View style={[globalStyles.container, { justifyContent: "center" }]}>
           <Text style={typography.errorText}>עדיין לא הוספת תרומות למערכת</Text>
-          <TouchableOpacity onPress={() => {router.push("/donations/add")}}>
-          <Text style={typography.linkText}>אנא הוסף תרומה חדשה</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              router.push("/donations/add");
+            }}
+          >
+            <Text style={typography.linkText}>אנא הוסף תרומה חדשה</Text>
+          </TouchableOpacity>
         </View>
       </NativeViewGestureHandler>
     );
@@ -480,103 +485,127 @@ const DonationsListScreen = () => {
     );
 
   return (
-    <GestureHandlerRootView style={globalStyles.scrollContainer}>
-      <FlatList
-        data={filteredDonations}
-        renderItem={renderDonationItem}
-        keyExtractor={(item) => item._id!}
-        //onEndReached={() => setPage((prevPage) => prevPage + 1)}
-        onEndReachedThreshold={0.1}
-        ListFooterComponent={renderFooter}
-        refreshing={loading}
-        onRefresh={fetchDonations}
-        ListHeaderComponent={
-          <>
-            {renderHeader()}
-            <TouchableOpacity
-              style={styles.filterButton}
-              onPress={() => sortBottomSheetRef.current!.expand()}
-            >
-              <Text style={styles.filterButtonText}>דרכי סינון ומיון</Text>
-            </TouchableOpacity>
-            <SearchBar
-              placeHolder="חפש לפי שם או כתובת"
-              handleSearch={handleSearch}
-              handleSave={handleSearch}
-              searchQuery={searchQuery}
-            />
-          </>
-        }
-      />
-      <CustomBottomSheet ref={sortBottomSheetRef}>
-        <View style={styles.modalContent}>
-          <Text style={typography.subheader}>סינון ומיון</Text>
-          {/* Date Range Picker */}
-          <View style={styles.datePickerContainer}>
-            <Text>תאריך התחלה</Text>
-            <DateTimePicker
-              value={dateRange.start || new Date()}
-              mode="date"
-              onChange={(event, selectedDate) =>
-                setDateRange({
-                  ...dateRange,
-                  start: selectedDate || new Date(),
-                })
-              }
-            />
+    <BottomSheetModalProvider>
+      <GestureHandlerRootView style={globalStyles.scrollContainer}>
+        <FlatList
+          data={filteredDonations}
+          renderItem={renderDonationItem}
+          keyExtractor={(item) => item._id!}
+          //onEndReached={() => setPage((prevPage) => prevPage + 1)}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={renderFooter}
+          refreshing={loading}
+          onRefresh={fetchDonations}
+          ListHeaderComponent={
+            <>
+              {renderHeader()}
+              <TouchableOpacity
+                style={styles.filterButton}
+                onPress={() => sortBottomSheetRef.current?.present()}
+              >
+                <Text style={styles.filterButtonText}>דרכי סינון ומיון</Text>
+              </TouchableOpacity>
+              <SearchBar
+                placeHolder="חפש לפי שם או כתובת"
+                handleSearch={handleSearch}
+                handleSave={handleSearch}
+                searchQuery={searchQuery}
+              />
+            </>
+          }
+        />
+        <CustomBottomSheet ref={sortBottomSheetRef}>
+          <View style={styles.modalContent}>
+            <Text style={typography.subheader}>סינון ומיון</Text>
+            {/* Date Range Picker */}
+            {/* <View style={styles.datePickerContainer}>
+              <Text>תאריך התחלה</Text>
+              <DateTimePicker
+                value={dateRange.start || new Date()}
+                mode="date"
+                onChange={(event, selectedDate) =>
+                  setDateRange({
+                    ...dateRange,
+                    start: selectedDate || new Date(),
+                  })
+                }
+              />
 
-            <Text>תאריך סיום</Text>
-            <DateTimePicker
-              value={dateRange.end || new Date()}
-              mode="date"
-              onChange={(event, selectedDate) =>
-                setDateRange({
-                  ...dateRange,
-                  start: selectedDate || new Date(),
-                })
-              }
-            />
-          </View>
+              <Text>תאריך סיום</Text>
+              <DateTimePicker
+                value={dateRange.end || new Date()}
+                mode="date"
+                onChange={(event, selectedDate) =>
+                  setDateRange({
+                    ...dateRange,
+                    start: selectedDate || new Date(),
+                  })
+                }
+              />
+            </View> */}
 
-          {/* Amount Range Slider */}
-          <View style={styles.sliderContainer}>
-            <Text>
-              טווח סכומים: {amountRange.min} - {amountRange.max} ₪
-            </Text>
-            <MultiSlider
-              values={[amountRange.min, amountRange.max]}
-              sliderLength={300}
-              onValuesChange={(values: number[]) =>
-                setAmountRange({ min: values[0], max: values[1] })
-              }
-              min={0}
-              max={10000}
-              step={10}
-            />
-          </View>
+            {/* Amount Range Slider */}
+            <View style={styles.sliderContainer}>
+              <Text>
+                טווח סכומים: {amountRange.min} - {amountRange.max} ₪
+              </Text>
+              <MultiSlider
+                values={[amountRange.min, amountRange.max]}
+                sliderLength={300}
+                onValuesChange={(values: number[]) =>
+                  setAmountRange({ min: values[0], max: values[1] })
+                }
+                min={0}
+                max={10000}
+                step={10}
+              />
+            </View>
 
-          {/* <Button
+            {/* <Button
               mode="contained"
               title=""
               handlePress={() => filterBottomSheetRef.current?.close()}
             >
               אישור
             </Button> */}
-          <Button
-            title="סינון"
-            handlePress={() =>
-              filterDonations(searchQuery, dateRange, amountRange)
-            }
-          />
-          {/* <Button title="מיון" handlePress={() => handleSort} /> */}
-          <Text style={styles.bottomSheetTitle}>מיון תרומות</Text>
+            <Button
+              title="סינון"
+              handlePress={() =>
+                filterDonations(searchQuery, dateRange, amountRange)
+              }
+            />
+            {/* <Button title="מיון" handlePress={() => handleSort} /> */}
+            <Text style={styles.bottomSheetTitle}>מיון תרומות</Text>
 
-          {/* Sort Field */}
-          <View style={styles.sortContainer}>
-            <Text>שדה מיון</Text>
-            <View style={styles.buttonGroup}>
-              <BottomSheetFlashList data={sortOptions}></BottomSheetFlashList>
-              {/* <Button
+            {/* Sort Field */}
+            <View style={styles.sortContainer}>
+              <Text>שדה מיון</Text>
+              <View style={styles.buttonGroup}>
+              <FlashList
+  data={sortOptions}
+  renderItem={({ item }) => (
+    <TouchableOpacity 
+      onPress={() => handleSort(item.value)}
+      style={[
+        styles.option, 
+        sortOption === item.value && styles.selectedOption
+      ]}
+    >
+      <Text 
+        style={[
+          styles.optionText, 
+          sortOption === item.value && styles.selectedOptionText
+        ]}
+      >
+        {item.label}
+      </Text>
+    </TouchableOpacity>
+  )}
+  keyExtractor={(item) => item.value}
+  estimatedItemSize={50}
+/>
+                {/* <BottomSheetFlashList data={sortOptions} renderItem={undefined}></BottomSheetFlashList> */}
+                {/* <Button
       mode={sortField === "createdAt" ? "contained" : "outlined"}
       onPress={() => setSortField("createdAt")}
     >
@@ -588,28 +617,29 @@ const DonationsListScreen = () => {
     >
       סכום
     </Button> */}
+              </View>
             </View>
-          </View>
 
-          {/* Sort Direction */}
-          <View style={styles.sortContainer}>
-            <Text>כיוון מיון</Text>
-            <View style={styles.buttonGroup}>
-              <Button
-                title="מהנמוך לגבוה"
-                //mode={sortDirection === "asc" ? "contained" : "outlined"}
-                handlePress={() => setSortDirection("asc")}
-              />
-              <Button
-                //mode={sortDirection === "desc" ? "contained" : "outlined"}
-                title="מהגבוה לנמוך"
-                handlePress={() => setSortDirection("desc")}
-              />
+            {/* Sort Direction */}
+            <View style={styles.sortContainer}>
+              <Text>כיוון מיון</Text>
+              <View style={styles.buttonGroup}>
+                <Button
+                  title="מהנמוך לגבוה"
+                  //mode={sortDirection === "asc" ? "contained" : "outlined"}
+                  handlePress={() => setSortDirection("asc")}
+                />
+                <Button
+                  //mode={sortDirection === "desc" ? "contained" : "outlined"}
+                  title="מהגבוה לנמוך"
+                  handlePress={() => setSortDirection("desc")}
+                />
+              </View>
             </View>
           </View>
-        </View>
-      </CustomBottomSheet>
-    </GestureHandlerRootView>
+        </CustomBottomSheet>
+      </GestureHandlerRootView>
+    </BottomSheetModalProvider>
   );
 };
 // return (
@@ -844,7 +874,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   modalContent: {
-    width: 200,
+    //width: 200,
     backgroundColor: "black",
   },
 

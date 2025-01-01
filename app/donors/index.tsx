@@ -6,11 +6,8 @@ import {
   Text,
   TouchableOpacity,
   Animated,
-  Platform,
   Alert,
-  ScrollView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { getUserDonors } from "@/utils/api/donors";
 import DonorItem from "@/components/DonorItem";
 import { useRouter } from "expo-router";
@@ -62,12 +59,21 @@ const DonorListScreen = () => {
       "שם התורם, כתובת, אימייל, מספר פלאפון, מין, גיל, מצב משפחתי, השתייכות, ממוצע תרומות",
       ...donors.map(
         (d) =>
-          `${d.firstName + " " + d.lastName},${d.address.street + " " + d.address.building
-         + " " + d.address.apartment && ("/" + d.address.apartment) + " " + d.address.city + " " + d.address.country},${d.email.toLowerCase()},${
-            d.phoneNumber
-          },${d.gender},${d.age && d.age},${d.familyStatus},${d.affiliation},${
-            d.averageDonations
-          },`
+          `${d.firstName + " " + d.lastName},${
+            d.address.street +
+              " " +
+              d.address.building +
+              " " +
+              d.address.apartment &&
+            "/" +
+              d.address.apartment +
+              " " +
+              d.address.city +
+              " " +
+              d.address.country
+          },${d.email.toLowerCase()},${d.phoneNumber},${d.gender},${
+            d.age && d.age
+          },${d.familyStatus},${d.affiliation},${d.averageDonations},`
       ),
     ].join("\n");
 

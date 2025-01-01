@@ -24,7 +24,7 @@ export default function RootLayout() {
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="drawer" options={{ headerShown: false }} />
-          <Stack.Screen name="synagogues" options={{ headerShown: false }} />
+          <Stack.Screen name="synagogues" options={{ title: "בתי כנסת" }} />
           <Stack.Screen name="donors" options={{ title: "תורמים" }} />
           <Stack.Screen name="donations" options={{ title: "תרומות" }} />
         </Stack>

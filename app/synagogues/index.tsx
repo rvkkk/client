@@ -1,12 +1,10 @@
 import {
   View,
-  ScrollView,
   FlatList,
   TouchableOpacity,
   Text,
   StyleSheet,
   Animated,
-  Platform,
   Alert,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
@@ -22,6 +20,9 @@ import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import SynagogueItem from "@/components/SynagogueItem";
 import ErrorMessage from "@/components/ErrorMessage";
+import { NativeViewGestureHandler } from "react-native-gesture-handler";
+import { typography } from "@/styles/typography";
+import Link from "@/components/Link";
 
 const SynagoguesListScreen = () => {
   const { top: safeTop } = useSafeAreaInsets();
@@ -54,7 +55,7 @@ const SynagoguesListScreen = () => {
 
   const exportToCsv = useCallback(async () => {
     const BOM = "\uFEFF";
-    
+
     const csvContent = [
       BOM,
       "שם בית הכנסת, כתובת, השתייכות, ממוצע תרומות",
@@ -139,6 +140,27 @@ const SynagoguesListScreen = () => {
   if (isLoading) return <Loading size={"large"} />;
   if (error)
     return <ErrorMessage error={error} handleFetch={fetchSynagogues} />;
+
+  if (synagogues.length == 0)
+    return (
+      <NativeViewGestureHandler>
+        <View style={[globalStyles.container, { justifyContent: "center" }]}>
+          <Text style={typography.errorText}>
+            עדיין לא הוספת בתי כנסת למערכת
+          </Text>
+          <Link href={"/donations/add"} text={"אנא הוסף בית כנסת חדש"} />
+        </View>
+      </NativeViewGestureHandler>
+    );
+
+  if (filteredSynagogues.length == 0)
+    return (
+      <View style={[globalStyles.container, { justifyContent: "center" }]}>
+        <Text style={typography.errorText}>
+          לא קיימים נתוני בתי כנסת מתאימים
+        </Text>
+      </View>
+    );
 
   return (
     <FlatList

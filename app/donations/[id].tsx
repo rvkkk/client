@@ -224,7 +224,7 @@ const DonationPage = () => {
               multiline
               returnKeyType="done"
               onSubmitEditing={handleSubmit(onSubmit)}
-              //blurOnSubmit="blurAndSubmit"}
+              blurOnSubmit="blurAndSubmit"
             />
           )}
         />

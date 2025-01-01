@@ -2,7 +2,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ScrollView,
   FlatList,
   Animated,
   Alert,
